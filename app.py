@@ -43,7 +43,7 @@ def upload():
 
                 '''Save the image with a new randomly generated filename in the desired path, and return URL info.'''
                 filename = secrets.token_urlsafe(5)
-                file_without_exif.save(os.path.join(app.config['storage_folder'], filename + extension))
+                file_without_exif.save(os.path.join(app.config['STORAGE_FOLDER'], filename + extension))
                 return json.dumps({"filename": filename, "extension": extension}), 200
 
 
