@@ -1,9 +1,13 @@
+import json
 import os
+import secrets
 from os.path import splitext
 
 from flask import Flask, request
 
 from config import Config
+
+from PIL import Image
 
 
 image_extensions = ['.png', '.jpeg', '.jpg', '.gif']
@@ -20,7 +24,7 @@ def hello_world():  # put application's code here
 @app.route('/upload', methods=['POST'])
 def upload():
     if request.method == 'POST':
-        if request.form.to_dict(flat=False)['secret_key'][0] == "test": #app.config['SECRET_KEY']:
+        if request.form.to_dict(flat=False)['secret_key'][0] == app.config['SECRET_KEY']:
             file = request.files['sharex']
             extension = splitext(file.filename)[1]
             file.flush()
@@ -32,7 +36,15 @@ def upload():
                 return 'File size too large', 400
 
             else:
-                return extension
+                image = Image.open(file)
+                data = list(image.getdata())
+                file_without_exif = Image.new(image.mode, image.size)
+                file_without_exif.putdata(data)
+
+                '''Save the image with a new randomly generated filename in the desired path, and return URL info.'''
+                filename = secrets.token_urlsafe(5)
+                file_without_exif.save(os.path.join(app.config['storage_folder'], filename + extension))
+                return json.dumps({"filename": filename, "extension": extension}), 200
 
 
 if __name__ == '__main__':
