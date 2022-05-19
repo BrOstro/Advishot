@@ -3,6 +3,7 @@ import os
 import secrets
 import time
 from os.path import splitext
+from pathlib import Path
 
 from flask import Flask, request
 
@@ -51,6 +52,8 @@ def upload():
                 date_string = time.strftime("/%Y/%m/%d")
                 filename = secrets.token_urlsafe(5)
                 file_path = os.path.join(app.config['STORAGE_FOLDER'], date_string)
+                Path(file_path).mkdir(parents=True, exist_ok=True)
+
                 final_path = os.path.join(file_path, filename + extension)
 
                 file_without_exif.save(final_path)
