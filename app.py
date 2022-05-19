@@ -1,6 +1,7 @@
 import json
 import os
 import secrets
+import time
 from os.path import splitext
 
 from flask import Flask, request
@@ -11,6 +12,7 @@ from PIL import Image
 
 
 image_extensions = ['.png', '.jpeg', '.jpg', '.gif']
+vidya_extensions = ['.mp4', '.avi']
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -29,6 +31,10 @@ def upload():
             extension = splitext(file.filename)[1]
             file.flush()
             size = os.fstat(file.fileno()).st_size
+
+            #if extension in image_extensions:
+
+
             if extension not in image_extensions:
                 return 'File type is not supported', 415
 
@@ -42,9 +48,13 @@ def upload():
                 file_without_exif.putdata(data)
 
                 '''Save the image with a new randomly generated filename in the desired path, and return URL info.'''
+                date_string = time.strftime("/%Y/%m/%d")
                 filename = secrets.token_urlsafe(5)
-                file_without_exif.save(os.path.join(app.config['STORAGE_FOLDER'], filename + extension))
-                return json.dumps({"filename": filename, "extension": extension}), 200
+                file_path = os.path.join(app.config['STORAGE_FOLDER'], date_string)
+                final_path = os.path.join(file_path, filename + extension)
+
+                file_without_exif.save(final_path)
+                return json.dumps({"filename": final_path, "extension": extension}), 200
 
 
 if __name__ == '__main__':
