@@ -54,7 +54,8 @@ def upload():
                 file_path = os.path.join(app.config['STORAGE_FOLDER'], date_string)
 
                 print(file_path)
-                Path(file_path).mkdir(parents=True, exist_ok=True, mode=0o777)
+                os.makedirs(file_path)
+                #Path(file_path).mkdir(parents=True, exist_ok=True, mode=0o777)
 
                 final_path = os.path.join(file_path, filename + extension)
 
